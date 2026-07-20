@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.88.0
+        with:
+          components: clippy,rustfmt
+      - run: rustup target add thumbv7em-none-eabi
+      - run: cargo fmt --check
+      - name: Test with fresh compatible dependency resolution
+        run: cargo test --all-features
+      - run: cargo clippy --all-targets --all-features -- -D warnings
+      - run: cargo check --lib --target thumbv7em-none-eabi
+      - run: cargo doc --no-deps
+        env:
+          RUSTDOCFLAGS: -D warnings
