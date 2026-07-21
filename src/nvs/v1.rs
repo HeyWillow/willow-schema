@@ -14,6 +14,8 @@ use serde::{Deserialize, Serialize};
 /// This type models the serialized provisioning document shared by Willow and
 /// WAS. It does not model ESP-IDF NVS storage operations. `v1` is the Rust
 /// module version; no version property is added to the wire document.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
+#[cfg_attr(feature = "json-schema", schemars(rename = "WillowNvsConfigV1"))]
 #[derive(Clone, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Config {
     /// Configures the Willow Application Server connection.
@@ -48,6 +50,16 @@ impl fmt::Display for WifiPskError {
 ///
 /// The v1 firmware accepts WPA passphrases containing 8 through 63 printable
 /// ASCII bytes. The owned string is allocator-backed.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
+#[cfg_attr(
+    feature = "json-schema",
+    schemars(extend(
+        "minLength" = 8,
+        "maxLength" = 63,
+        "pattern" = r"^[\x20-\x7E]+$",
+        "x-willow-length-unit" = "bytes"
+    ))
+)]
 #[derive(Clone, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(try_from = "String")]
 pub struct WifiPsk(String);
@@ -101,6 +113,15 @@ impl fmt::Display for WifiSsidError {
 /// The v1 firmware stores SSIDs containing 1 through 32 bytes. The owned
 /// string is allocator-backed, so it can represent UTF-8 SSIDs within that
 /// byte limit.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
+#[cfg_attr(
+    feature = "json-schema",
+    schemars(extend(
+        "minLength" = 1,
+        "maxLength" = 32,
+        "x-willow-max-utf8-bytes" = 32
+    ))
+)]
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(try_from = "String")]
 pub struct WifiSsid(String);
@@ -131,6 +152,7 @@ impl TryFrom<String> for WifiSsid {
 }
 
 /// Willow Application Server NVS namespace values.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Was {
     /// Sets the WebSocket URL used to connect to WAS.
@@ -139,6 +161,7 @@ pub struct Was {
 }
 
 /// Wi-Fi NVS namespace values.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Deserialize, Eq, PartialEq, Serialize)]
 pub struct Wifi {
     /// Sets the WPA passphrase.

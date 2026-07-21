@@ -1,0 +1,69 @@
+{
+  "$id": "urn:heywillow:schema:nvs:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WillowNvsConfigV1",
+  "description": "The complete Willow NVS provisioning v1 JSON document.\n\nEach known section and property is required because Willow cannot connect\nto Wi-Fi or its application server without these values. Unknown object\nproperties are accepted during deserialization but are not retained, so\nthis typed representation does not promise lossless round-tripping.\n\nThis type models the serialized provisioning document shared by Willow and\nWAS. It does not model ESP-IDF NVS storage operations. `v1` is the Rust\nmodule version; no version property is added to the wire document.",
+  "type": "object",
+  "properties": {
+    "WAS": {
+      "description": "Configures the Willow Application Server connection.",
+      "$ref": "#/$defs/Was"
+    },
+    "WIFI": {
+      "description": "Configures the Wi-Fi connection.",
+      "$ref": "#/$defs/Wifi"
+    }
+  },
+  "required": [
+    "WAS",
+    "WIFI"
+  ],
+  "$defs": {
+    "Was": {
+      "description": "Willow Application Server NVS namespace values.",
+      "type": "object",
+      "properties": {
+        "URL": {
+          "description": "Sets the WebSocket URL used to connect to WAS.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "URL"
+      ]
+    },
+    "Wifi": {
+      "description": "Wi-Fi NVS namespace values.",
+      "type": "object",
+      "properties": {
+        "PSK": {
+          "description": "Sets the WPA passphrase.",
+          "$ref": "#/$defs/WifiPsk"
+        },
+        "SSID": {
+          "description": "Sets the service set identifier.",
+          "$ref": "#/$defs/WifiSsid"
+        }
+      },
+      "required": [
+        "PSK",
+        "SSID"
+      ]
+    },
+    "WifiPsk": {
+      "description": "A validated Wi-Fi WPA passphrase.\n\nThe v1 firmware accepts WPA passphrases containing 8 through 63 printable\nASCII bytes. The owned string is allocator-backed.",
+      "type": "string",
+      "maxLength": 63,
+      "minLength": 8,
+      "pattern": "^[\\x20-\\x7E]+$",
+      "x-willow-length-unit": "bytes"
+    },
+    "WifiSsid": {
+      "description": "A validated Wi-Fi service set identifier.\n\nThe v1 firmware stores SSIDs containing 1 through 32 bytes. The owned\nstring is allocator-backed, so it can represent UTF-8 SSIDs within that\nbyte limit.",
+      "type": "string",
+      "maxLength": 32,
+      "minLength": 1,
+      "x-willow-max-utf8-bytes": 32
+    }
+  }
+}

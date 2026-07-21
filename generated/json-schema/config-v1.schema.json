@@ -1,0 +1,575 @@
+{
+  "$id": "urn:heywillow:schema:config:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "WillowConfigV1",
+  "description": "The existing, flat Willow configuration v1 JSON document.\n\nEvery known property is optional because deployed firmware accepts partial\ndocuments. A missing known property and a known property explicitly set to\nJSON `null` both deserialize as `None`. `None` values are omitted during\nserialization, so an explicit `null` is normalized to an absent property by\na typed deserialize/serialize cycle.\n\nUnknown object properties are accepted during deserialization but are not\nretained. This typed representation therefore does not promise lossless\nround-tripping.\n\n`v1` is the Rust module version. No version property is added to the wire\ndocument.",
+  "type": "object",
+  "properties": {
+    "aec": {
+      "description": "Enables acoustic echo cancellation on the device.",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "audio_codec": {
+      "description": "Selects the audio encoding used for WIS streaming.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AudioCodec"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "audio_response_type": {
+      "description": "Selects the audible command-response behavior.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AudioResponseType"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "bss": {
+      "description": "Enables blind source separation on the device.",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "command_endpoint": {
+      "description": "Selects the service that executes recognized commands.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CommandEndpoint"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "display_timeout": {
+      "description": "Sets the display timeout in seconds.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "uint32",
+      "maximum": 4294967295,
+      "minimum": 0
+    },
+    "hass_host": {
+      "description": "Sets the Home Assistant host name or address.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "hass_port": {
+      "description": "Sets the Home Assistant TCP port.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "uint16",
+      "maximum": 65535,
+      "minimum": 0
+    },
+    "hass_tls": {
+      "description": "Enables TLS for Home Assistant connections.",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "hass_token": {
+      "description": "Sets the Home Assistant access token.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "lcd_brightness": {
+      "description": "Sets the LCD backlight PWM level.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "uint16",
+      "maximum": 65535,
+      "minimum": 0
+    },
+    "lvgl_lock_timeout": {
+      "description": "Sets the LVGL lock timeout in milliseconds.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "uint32",
+      "maximum": 4294967295,
+      "minimum": 0
+    },
+    "mic_gain": {
+      "description": "Sets the microphone gain.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "uint8",
+      "maximum": 255,
+      "minimum": 0
+    },
+    "mqtt_auth_type": {
+      "description": "Selects the MQTT authentication mode.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MqttAuthType"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "mqtt_host": {
+      "description": "Sets the MQTT broker host name or address.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "mqtt_password": {
+      "description": "Sets the MQTT password.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "mqtt_port": {
+      "description": "Sets the MQTT broker TCP port as a JSON number.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "uint16",
+      "maximum": 65535,
+      "minimum": 0
+    },
+    "mqtt_tls": {
+      "description": "Enables TLS for MQTT connections.",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "mqtt_topic": {
+      "description": "Sets the MQTT topic.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "mqtt_username": {
+      "description": "Sets the MQTT user name.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "multiwake": {
+      "description": "Enables Willow One Wake arbitration.",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "ntp_config": {
+      "description": "Selects the NTP configuration source.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/NtpConfig"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ntp_host": {
+      "description": "Sets the explicitly configured NTP host.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "openhab_token": {
+      "description": "Sets the openHAB access token.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "openhab_url": {
+      "description": "Sets the openHAB base URL.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "record_buffer": {
+      "description": "Sets the recorder ring-buffer size in KiB.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "uint16",
+      "maximum": 65535,
+      "minimum": 0
+    },
+    "rest_auth_header": {
+      "description": "Sets the header value used for REST Header authentication.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rest_auth_pass": {
+      "description": "Sets the password used for REST Basic authentication.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rest_auth_type": {
+      "description": "Selects the REST authentication mode.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RestAuthType"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "rest_auth_user": {
+      "description": "Sets the user name used for REST Basic authentication.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "rest_url": {
+      "description": "Sets the generic REST command endpoint URL.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "show_prereleases": {
+      "description": "Includes prerelease firmware builds in upgrade listings.",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "speaker_volume": {
+      "description": "Sets the speaker volume percentage.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "uint8",
+      "maximum": 255,
+      "minimum": 0
+    },
+    "speech_rec_mode": {
+      "description": "Selects the speech-recognition implementation.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SpeechRecognitionMode"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "stream_timeout": {
+      "description": "Sets the speech stream or session timeout in seconds.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "uint32",
+      "maximum": 4294967295,
+      "minimum": 0
+    },
+    "timezone": {
+      "description": "Sets the POSIX timezone string used by the device.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "timezone_name": {
+      "description": "Sets the human-readable IANA timezone selection.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "vad_mode": {
+      "description": "Selects the voice-activity detector aggressiveness.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/VadMode"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "vad_timeout": {
+      "description": "Sets the silence duration that ends speech, in milliseconds.",
+      "type": [
+        "integer",
+        "null"
+      ],
+      "format": "uint32",
+      "maximum": 4294967295,
+      "minimum": 0
+    },
+    "wake_confirmation": {
+      "description": "Enables the wake-confirmation tone.",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "wake_mode": {
+      "description": "Selects the `WakeNet` channel and sensitivity mode.",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/WakeMode"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "wake_word": {
+      "description": "Sets the wake-word or model identifier.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "was_mode": {
+      "description": "Routes command execution through WAS.",
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "wis_tts_url": {
+      "description": "Sets the legacy base WIS TTS URL.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "wis_tts_url_v2": {
+      "description": "Sets the WIS TTS URL template containing the text query parameter.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "wis_url": {
+      "description": "Sets the WIS speech-recognition URL.",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "$defs": {
+    "AudioCodec": {
+      "description": "Audio encoding sent to Willow Inference Server.",
+      "oneOf": [
+        {
+          "description": "Adaptive Multi-Rate Wideband audio.",
+          "type": "string",
+          "const": "AMR-WB"
+        },
+        {
+          "description": "Raw PCM audio.",
+          "type": "string",
+          "const": "PCM"
+        },
+        {
+          "description": "WAV-wrapped PCM audio.",
+          "type": "string",
+          "const": "WAV"
+        }
+      ]
+    },
+    "AudioResponseType": {
+      "description": "Audible response behavior after command execution.",
+      "oneOf": [
+        {
+          "description": "Play response chimes.",
+          "type": "string",
+          "const": "Chimes"
+        },
+        {
+          "description": "Produce no audible response.",
+          "type": "string",
+          "const": "None"
+        },
+        {
+          "description": "Speak the response using text-to-speech.",
+          "type": "string",
+          "const": "TTS"
+        }
+      ]
+    },
+    "CommandEndpoint": {
+      "description": "Destination used to execute recognized commands.",
+      "oneOf": [
+        {
+          "description": "Home Assistant.",
+          "type": "string",
+          "const": "Home Assistant"
+        },
+        {
+          "description": "An MQTT broker.",
+          "type": "string",
+          "const": "MQTT"
+        },
+        {
+          "description": "openHAB.",
+          "type": "string",
+          "const": "openHAB"
+        },
+        {
+          "description": "A generic REST endpoint.",
+          "type": "string",
+          "const": "REST"
+        }
+      ]
+    },
+    "MqttAuthType": {
+      "description": "Authentication mode used by the MQTT command endpoint.",
+      "oneOf": [
+        {
+          "description": "No authentication.",
+          "type": "string",
+          "const": "none"
+        },
+        {
+          "description": "User name and password authentication.",
+          "type": "string",
+          "const": "userpw"
+        }
+      ]
+    },
+    "NtpConfig": {
+      "description": "Source of the NTP server configuration.",
+      "oneOf": [
+        {
+          "description": "Obtain the NTP host through DHCP.",
+          "type": "string",
+          "const": "DHCP"
+        },
+        {
+          "description": "Use the explicitly configured NTP host.",
+          "type": "string",
+          "const": "Host"
+        }
+      ]
+    },
+    "RestAuthType": {
+      "description": "Authentication mode used by the generic REST command endpoint.",
+      "oneOf": [
+        {
+          "description": "HTTP Basic authentication.",
+          "type": "string",
+          "const": "Basic"
+        },
+        {
+          "description": "Authentication through a custom request header.",
+          "type": "string",
+          "const": "Header"
+        },
+        {
+          "description": "No authentication.",
+          "type": "string",
+          "const": "None"
+        }
+      ]
+    },
+    "SpeechRecognitionMode": {
+      "description": "Speech-recognition implementation selected by the firmware.",
+      "oneOf": [
+        {
+          "description": "On-device Multinet recognition.",
+          "type": "string",
+          "const": "Multinet"
+        },
+        {
+          "description": "Willow Inference Server recognition.",
+          "type": "string",
+          "const": "WIS"
+        }
+      ]
+    },
+    "VadMode": {
+      "description": "ESP-SR voice-activity detector aggressiveness.",
+      "type": "integer",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "WakeMode": {
+      "description": "`WakeNet` recognition channel and sensitivity mode.",
+      "oneOf": [
+        {
+          "description": "One-channel recognition at the 90% sensitivity setting.",
+          "type": "string",
+          "const": "1CH_90"
+        },
+        {
+          "description": "One-channel recognition at the 95% sensitivity setting.",
+          "type": "string",
+          "const": "1CH_95"
+        },
+        {
+          "description": "Three-channel recognition at the 90% sensitivity setting.",
+          "type": "string",
+          "const": "3CH_90"
+        },
+        {
+          "description": "Three-channel recognition at the 95% sensitivity setting.",
+          "type": "string",
+          "const": "3CH_95"
+        },
+        {
+          "description": "Two-channel recognition at the 90% sensitivity setting.",
+          "type": "string",
+          "const": "2CH_90"
+        },
+        {
+          "description": "Two-channel recognition at the 95% sensitivity setting.",
+          "type": "string",
+          "const": "2CH_95"
+        }
+      ]
+    }
+  }
+}

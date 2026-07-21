@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 
 /// Audio encoding sent to Willow Inference Server.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum AudioCodec {
     /// Adaptive Multi-Rate Wideband audio.
@@ -19,6 +20,7 @@ pub enum AudioCodec {
 }
 
 /// Audible response behavior after command execution.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum AudioResponseType {
     /// Play response chimes.
@@ -32,6 +34,7 @@ pub enum AudioResponseType {
 }
 
 /// Destination used to execute recognized commands.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum CommandEndpoint {
     /// Home Assistant.
@@ -49,6 +52,7 @@ pub enum CommandEndpoint {
 }
 
 /// Authentication mode used by the MQTT command endpoint.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum MqttAuthType {
     /// No authentication.
@@ -60,6 +64,7 @@ pub enum MqttAuthType {
 }
 
 /// Source of the NTP server configuration.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum NtpConfig {
     /// Obtain the NTP host through DHCP.
@@ -70,6 +75,7 @@ pub enum NtpConfig {
 }
 
 /// Authentication mode used by the generic REST command endpoint.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum RestAuthType {
     /// HTTP Basic authentication.
@@ -82,6 +88,7 @@ pub enum RestAuthType {
 }
 
 /// Speech-recognition implementation selected by the firmware.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum SpeechRecognitionMode {
     /// On-device Multinet recognition.
@@ -92,6 +99,7 @@ pub enum SpeechRecognitionMode {
 }
 
 /// ESP-SR voice-activity detector aggressiveness.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema_repr))]
 #[derive(Clone, Copy, Debug, Deserialize_repr, Eq, PartialEq, Serialize_repr)]
 #[repr(u8)]
 pub enum VadMode {
@@ -108,6 +116,7 @@ pub enum VadMode {
 }
 
 /// `WakeNet` recognition channel and sensitivity mode.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, Serialize)]
 pub enum WakeMode {
     /// One-channel recognition at the 90% sensitivity setting.
@@ -144,6 +153,8 @@ pub enum WakeMode {
 ///
 /// `v1` is the Rust module version. No version property is added to the wire
 /// document.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
+#[cfg_attr(feature = "json-schema", schemars(rename = "WillowConfigV1"))]
 #[derive(Clone, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub struct Config {
@@ -163,6 +174,10 @@ pub struct Config {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub command_endpoint: Option<CommandEndpoint>,
     /// Sets the display timeout in seconds.
+    #[cfg_attr(
+        feature = "json-schema",
+        schemars(extend("maximum" = u32::MAX))
+    )]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub display_timeout: Option<u32>,
     /// Sets the Home Assistant host name or address.
@@ -181,6 +196,10 @@ pub struct Config {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lcd_brightness: Option<u16>,
     /// Sets the LVGL lock timeout in milliseconds.
+    #[cfg_attr(
+        feature = "json-schema",
+        schemars(extend("maximum" = u32::MAX))
+    )]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub lvgl_lock_timeout: Option<u32>,
     /// Sets the microphone gain.
@@ -250,6 +269,10 @@ pub struct Config {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub speech_rec_mode: Option<SpeechRecognitionMode>,
     /// Sets the speech stream or session timeout in seconds.
+    #[cfg_attr(
+        feature = "json-schema",
+        schemars(extend("maximum" = u32::MAX))
+    )]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub stream_timeout: Option<u32>,
     /// Sets the POSIX timezone string used by the device.
@@ -262,6 +285,10 @@ pub struct Config {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vad_mode: Option<VadMode>,
     /// Sets the silence duration that ends speech, in milliseconds.
+    #[cfg_attr(
+        feature = "json-schema",
+        schemars(extend("maximum" = u32::MAX))
+    )]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vad_timeout: Option<u32>,
     /// Enables the wake-confirmation tone.

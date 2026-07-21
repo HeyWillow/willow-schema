@@ -28,7 +28,19 @@ Externally sourced deployed documents may be retained as golden fixtures when
 they provide an independent compatibility reference. See the respective `v1`
 configuration types for exact wire semantics.
 
-There are no generated JSON Schema or TypeScript artifacts in this revision.
+JSON Schema draft 2020-12 documents generated from the deserialization
+contracts are committed under `generated/json-schema`. They are derived
+artifacts for non-Rust consumers, not an independent source of truth. The NVS
+SSID schema uses `x-willow-max-utf8-bytes` because standard JSON Schema string
+length keywords count characters rather than encoded bytes. Its standard
+`maxLength` remains useful as a necessary, but not sufficient, byte-length
+constraint.
+
+Integer schemas retain Schemars' non-standard `uint8`, `uint16`, and `uint32`
+format annotations. Strict validators must register or ignore those formats.
+The standard `minimum` and `maximum` keywords define the accepted ranges.
+
+There are no generated language bindings in this revision.
 
 This README is included as the crate-level Rust documentation; equivalent
 prose is not maintained separately in `src/lib.rs`.
@@ -37,11 +49,18 @@ prose is not maintained separately in `src/lib.rs`.
 
 ```sh
 cargo fmt --check
-cargo test --all-features
-cargo clippy --all-targets --all-features -- -D warnings
+cargo test --workspace --all-features
+cargo xtask json-schema --check
+cargo clippy --workspace --all-targets --all-features -- -D warnings
 RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
 rustup target add thumbv7em-none-eabi
 cargo check --lib --target thumbv7em-none-eabi
+```
+
+Run the generator without `--check` after changing a serialized contract:
+
+```sh
+cargo xtask json-schema
 ```
 
 ## Compatibility and versioning

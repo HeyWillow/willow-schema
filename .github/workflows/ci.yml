@@ -17,8 +17,10 @@ jobs:
       - run: rustup target add thumbv7em-none-eabi
       - run: cargo fmt --check
       - name: Test with fresh compatible dependency resolution
-        run: cargo test --all-features
-      - run: cargo clippy --all-targets --all-features -- -D warnings
+        run: cargo test --workspace --all-features
+      - name: Check generated JSON Schema
+        run: cargo xtask json-schema --check
+      - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
       - run: cargo check --lib --target thumbv7em-none-eabi
       - run: cargo doc --no-deps
         env:

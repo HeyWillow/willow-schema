@@ -7,6 +7,14 @@ license = "Apache-2.0"
 description = "Versioned Willow configuration data contracts"
 repository = "https://github.com/HeyWillow/willow-schema"
 
+[workspace]
+members = ["xtask"]
+resolver = "3"
+
+[features]
+default = []
+json-schema = ["dep:schemars"]
+
 [lints.clippy]
 pedantic = "forbid"
 
@@ -15,6 +23,7 @@ missing_docs = "warn"
 unsafe_code = "forbid"
 
 [dependencies]
+schemars = { version = "=1.2.1", default-features = false, features = ["derive"], optional = true }
 serde = { version = "1", default-features = false, features = ["alloc", "derive"] }
 serde_repr = "0.1"
 
