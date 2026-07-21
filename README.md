@@ -1,8 +1,9 @@
 # willow-schema
 
 `willow-schema` defines the existing Willow configuration v1 serialized
-contract. The crate provides the flat wire-compatible Rust type at
-`willow_schema::config::v1::Config` and the enums used by that document.
+contracts. The crate provides the flat application configuration at
+`willow_schema::config::v1::Config` and the NVS provisioning document at
+`willow_schema::nvs::v1::Config`.
 
 The runtime crate is unconditionally `no_std` and uses `alloc` for owned wire
 values. It supports `no_std` environments with an allocator; it is not intended
@@ -10,21 +11,22 @@ for allocation-free environments.
 
 ## Scope and non-goals
 
-This initial revision contains configuration data contracts only. It does not
+This repository contains configuration data contracts only. It does not
 contain runtime protocol or notification messages, WIS messages, REST or
-database representations, ESP-IDF integration, NVS documents, resolved runtime
-configuration, or consumer-specific recovery policies.
+database representations, ESP-IDF integration, resolved runtime configuration,
+or consumer-specific recovery policies. The NVS provisioning document models
+serialized values shared between WAS and Willow, not ESP-IDF storage mechanics.
 
 Runtime messages belong in a separate `willow-protocol` project if they later
 need to be shared.
 
 ## Source of truth
 
-Rust types, Serde attributes, Rust doc comments, and
-`Config::was_provisioning_defaults()` are authoritative. Wire compatibility is
-covered by Rust tests. Externally sourced deployed documents may be retained as
-golden fixtures when they provide an independent compatibility reference. See
-`willow_schema::config::v1::Config` for exact wire semantics.
+Rust types, Serde attributes, Rust doc comments, and explicit Rust provisioning
+functions are authoritative. Wire compatibility is covered by Rust tests.
+Externally sourced deployed documents may be retained as golden fixtures when
+they provide an independent compatibility reference. See the respective `v1`
+configuration types for exact wire semantics.
 
 There are no generated JSON Schema or TypeScript artifacts in this revision.
 
