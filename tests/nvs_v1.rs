@@ -74,9 +74,20 @@ fn unknown_properties_are_accepted_but_not_retained() {
 fn was_python_nvs_document_is_the_v1_migration_oracle() {
     let expected: Value = serde_json::from_str(WAS_PYTHON_NVS_V1)
         .expect("Python WAS NVS fixture should contain JSON");
+    let defaults = Config::was_provisioning_defaults();
+    let actual = serde_json::to_value(&defaults).expect("defaults should serialize");
+
+    assert_eq!(
+        actual, expected,
+        "Python WAS NVS defaults differ from the v1 migration oracle"
+    );
     let document: Config = serde_json::from_value(expected.clone())
         .expect("Python WAS NVS fixture should deserialize");
 
+    assert!(
+        document == defaults,
+        "Python WAS NVS fixture differs from its Rust constructor"
+    );
     assert_eq!(document.was.url.as_str(), "wss://was.local/ws");
     assert_eq!(document.wifi.psk.as_str(), "mypassword");
     assert_eq!(document.wifi.ssid.as_str(), "myssid");

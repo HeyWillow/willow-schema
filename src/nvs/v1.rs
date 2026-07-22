@@ -27,6 +27,30 @@ pub struct Config {
     pub wifi: Wifi,
 }
 
+impl Config {
+    /// Constructs the deployed user-facing provisioning document produced by
+    /// the Python Willow Application Server.
+    ///
+    /// # Panics
+    ///
+    /// Panics if a built-in value does not satisfy its provisioning contract.
+    #[must_use]
+    pub fn was_provisioning_defaults() -> Self {
+        Self {
+            was: Was {
+                url: WasUrl::try_from(String::from("wss://was.local/ws"))
+                    .expect("built-in WAS URL must satisfy the provisioning contract"),
+            },
+            wifi: Wifi {
+                psk: WifiPsk::try_from(String::from("mypassword"))
+                    .expect("built-in Wi-Fi PSK must satisfy the provisioning contract"),
+                ssid: WifiSsid::try_from(String::from("myssid"))
+                    .expect("built-in Wi-Fi SSID must satisfy the provisioning contract"),
+            },
+        }
+    }
+}
+
 /// Error returned when a Willow Application Server URL violates the v1
 /// provisioning contract.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
