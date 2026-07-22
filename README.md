@@ -51,6 +51,11 @@ Integer schemas retain Schemars' non-standard `uint8`, `uint16`, and `uint32`
 format annotations. Strict validators must register or ignore those formats.
 The standard `minimum` and `maximum` keywords define the accepted ranges.
 
+Complete Python WAS provisioning documents generated from the explicit Rust
+defaults are committed under `generated/defaults`. These are policy-level
+defaults rather than `Default` implementations for the wire types. The
+historical Python WAS documents remain independent golden fixtures.
+
 There are no generated language bindings in this revision.
 
 This README is included as the crate-level Rust documentation; equivalent
@@ -62,16 +67,19 @@ prose is not maintained separately in `src/lib.rs`.
 cargo fmt --check
 cargo test --workspace --all-features
 cargo xtask json-schema --check
+cargo xtask provisioning-defaults --check
 cargo clippy --workspace --all-targets --all-features -- -D warnings
 RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
 rustup target add thumbv7em-none-eabi
 cargo check --lib --target thumbv7em-none-eabi
 ```
 
-Run the generator without `--check` after changing a serialized contract:
+Run the generators without `--check` after changing a serialized contract or
+its provisioning defaults:
 
 ```sh
 cargo xtask json-schema
+cargo xtask provisioning-defaults
 ```
 
 ## Compatibility and versioning

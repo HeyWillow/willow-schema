@@ -3,14 +3,14 @@
 use std::{env, fs, io, path::Path};
 
 use schemars::{JsonSchema, Schema, generate::SchemaSettings};
-use serde_json::Value;
 use willow_schema::{config, nvs};
 
-const OUTPUT_DIRECTORY: &str = "generated/json-schema";
+const JSON_SCHEMA_OUTPUT_DIRECTORY: &str = "generated/json-schema";
+const PROVISIONING_DEFAULTS_OUTPUT_DIRECTORY: &str = "generated/defaults";
 
 struct Document {
     file_name: &'static str,
-    schema: Schema,
+    contents: String,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -23,7 +23,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     {
         ["json-schema"] => generate_json_schema(false),
         ["json-schema", "--check"] => generate_json_schema(true),
-        _ => Err("usage: cargo xtask json-schema [--check]".into()),
+        ["provisioning-defaults"] => generate_provisioning_defaults(false),
+        ["provisioning-defaults", "--check"] => generate_provisioning_defaults(true),
+        _ => Err("usage: cargo xtask <json-schema|provisioning-defaults> [--check]".into()),
     }
 }
 
@@ -31,15 +33,56 @@ fn generate_json_schema(check: bool) -> Result<(), Box<dyn std::error::Error>> {
     let documents = [
         Document {
             file_name: "config-v1.schema.json",
-            schema: generate::<config::v1::Config>("urn:heywillow:schema:config:v1"),
+            contents: serde_json::to_string_pretty(&generate::<config::v1::Config>(
+                "urn:heywillow:schema:config:v1",
+            ))?,
         },
         Document {
             file_name: "nvs-v1.schema.json",
-            schema: generate::<nvs::v1::Config>("urn:heywillow:schema:nvs:v1"),
+            contents: serde_json::to_string_pretty(&generate::<nvs::v1::Config>(
+                "urn:heywillow:schema:nvs:v1",
+            ))?,
         },
     ];
 
-    let output_directory = workspace_root().join(OUTPUT_DIRECTORY);
+    generate_documents(
+        check,
+        JSON_SCHEMA_OUTPUT_DIRECTORY,
+        "JSON Schema documents",
+        documents,
+    )
+}
+
+fn generate_provisioning_defaults(check: bool) -> Result<(), Box<dyn std::error::Error>> {
+    let documents = [
+        Document {
+            file_name: "config-v1.json",
+            contents: serde_json::to_string_pretty(
+                &config::v1::Config::was_provisioning_defaults(),
+            )?,
+        },
+        Document {
+            file_name: "nvs-v1.json",
+            contents: serde_json::to_string_pretty(&nvs::v1::Config::was_provisioning_defaults())?,
+        },
+    ];
+
+    generate_documents(
+        check,
+        PROVISIONING_DEFAULTS_OUTPUT_DIRECTORY,
+        "provisioning defaults",
+        documents,
+    )
+}
+
+fn generate_documents(
+    check: bool,
+    output_directory: &str,
+    description: &str,
+    documents: impl IntoIterator<Item = Document>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let output_directory = workspace_root().join(output_directory);
+
     if !check {
         fs::create_dir_all(&output_directory)?;
     }
@@ -47,7 +90,7 @@ fn generate_json_schema(check: bool) -> Result<(), Box<dyn std::error::Error>> {
     let mut stale = Vec::new();
     for document in documents {
         let path = output_directory.join(document.file_name);
-        let mut expected = serde_json::to_string_pretty(&document.schema)?;
+        let mut expected = document.contents;
         expected.push('\n');
 
         if check {
@@ -68,7 +111,7 @@ fn generate_json_schema(check: bool) -> Result<(), Box<dyn std::error::Error>> {
             .map(|path| path.display().to_string())
             .collect::<Vec<_>>()
             .join(", ");
-        Err(format!("generated JSON Schema is stale or missing: {paths}").into())
+        Err(format!("generated {description} are stale or missing: {paths}").into())
     }
 }
 
@@ -79,7 +122,7 @@ fn generate<T: JsonSchema>(id: &str) -> Schema {
     let mut schema = generator.into_root_schema_for::<T>();
     schema
         .ensure_object()
-        .insert("$id".into(), Value::String(id.into()));
+        .insert("$id".into(), serde_json::Value::String(id.into()));
     schema
 }
 
