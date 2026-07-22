@@ -1,0 +1,9 @@
+{
+  "WAS": {
+    "URL": "wss://was.local/ws"
+  },
+  "WIFI": {
+    "PSK": "mypassword",
+    "SSID": "myssid"
+  }
+}

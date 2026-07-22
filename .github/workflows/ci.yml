@@ -20,6 +20,8 @@ jobs:
         run: cargo test --workspace --all-features
       - name: Check generated JSON Schema
         run: cargo xtask json-schema --check
+      - name: Check generated provisioning defaults
+        run: cargo xtask provisioning-defaults --check
       - run: cargo clippy --workspace --all-targets --all-features -- -D warnings
       - run: cargo check --lib --target thumbv7em-none-eabi
       - run: cargo doc --no-deps
