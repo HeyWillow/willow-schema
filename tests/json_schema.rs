@@ -74,6 +74,17 @@ fn nvs_schema_preserves_required_fields_and_byte_constraints() {
     assert_eq!(schema["$defs"]["Was"]["required"], json!(["URL"]));
     assert_eq!(schema["$defs"]["Wifi"]["required"], json!(["PSK", "SSID"]));
 
+    let was_url = &schema["$defs"]["WasUrl"];
+    assert!(was_url.get("format").is_none());
+    assert_eq!(was_url["pattern"], r"^wss?://[\s\S]*/ws$");
+    assert_eq!(
+        was_url["x-willow-url-validation"],
+        json!({
+            "parser": "whatwg",
+            "pathnameSuffix": "/ws"
+        })
+    );
+
     let psk = &schema["$defs"]["WifiPsk"];
     assert_eq!(psk["minLength"], 8);
     assert_eq!(psk["maxLength"], 63);

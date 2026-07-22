@@ -2,7 +2,9 @@
 
 use pretty_assertions::assert_eq;
 use serde_json::Value;
-use willow_schema::nvs::v1::{Config, WifiPsk, WifiPskError, WifiSsid, WifiSsidError};
+use willow_schema::nvs::v1::{
+    Config, WasUrl, WasUrlError, WifiPsk, WifiPskError, WifiSsid, WifiSsidError,
+};
 
 // Imported byte-for-byte as a migration oracle from
 // HeyWillow/willow-application-server, default_nvs.json at commit
@@ -75,13 +77,56 @@ fn was_python_nvs_document_is_the_v1_migration_oracle() {
     let document: Config = serde_json::from_value(expected.clone())
         .expect("Python WAS NVS fixture should deserialize");
 
-    assert_eq!(document.was.url, "wss://was.local/ws");
+    assert_eq!(document.was.url.as_str(), "wss://was.local/ws");
     assert_eq!(document.wifi.psk.as_str(), "mypassword");
     assert_eq!(document.wifi.ssid.as_str(), "myssid");
     assert_eq!(
         serde_json::to_value(document).expect("NVS document should serialize"),
         expected
     );
+}
+
+#[test]
+fn was_url_matches_the_typescript_ui_contract() {
+    for value in [
+        "ws://was.local/ws",
+        "wss://was.local/ws",
+        "ws://was.local:8502/ws",
+        "wss://[::1]:8503/prefix/ws",
+        "wss://пример.рф/ws",
+        "wss:////was.local/ws",
+        "wss://user:secret@was.local/ws",
+        "wss://was.local/ws?next=/ws",
+        "wss://was.local/ws?token=secret/ws",
+        "wss://was.local/ws#/ws",
+    ] {
+        assert!(
+            WasUrl::try_from(String::from(value)).is_ok(),
+            "{value} should be valid"
+        );
+    }
+
+    let cases = [
+        ("not a URL", WasUrlError::InvalidUrl),
+        ("https://was.local/ws", WasUrlError::InvalidScheme),
+        ("WS://was.local/ws", WasUrlError::InvalidScheme),
+        ("wss://was.local/", WasUrlError::InvalidPath),
+        ("wss://was.local/#/ws", WasUrlError::InvalidPath),
+        ("wss://was.local?next=/ws", WasUrlError::InvalidPath),
+        ("wss:///ws", WasUrlError::InvalidPath),
+        ("wss://[v1.foo]/ws", WasUrlError::InvalidUrl),
+    ];
+    for (value, expected) in cases {
+        assert_eq!(WasUrl::try_from(String::from(value)).err(), Some(expected));
+        assert_eq!(
+            expected.to_string(),
+            match expected {
+                WasUrlError::InvalidUrl => "URL is invalid",
+                WasUrlError::InvalidScheme => "URL must start with ws:// or wss://",
+                WasUrlError::InvalidPath => "URL must end with /ws",
+            }
+        );
+    }
 }
 
 #[test]
@@ -152,6 +197,10 @@ fn wrongly_typed_and_invalid_values_are_rejected() {
         (
             "empty SSID",
             r#"{"WAS":{"URL":"wss://was.local/ws"},"WIFI":{"PSK":"password","SSID":""}}"#,
+        ),
+        (
+            "fragment masquerading as WebSocket path",
+            r#"{"WAS":{"URL":"wss://was.local/#/ws"},"WIFI":{"PSK":"password","SSID":"wifi"}}"#,
         ),
     ];
 

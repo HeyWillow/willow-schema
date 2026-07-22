@@ -25,12 +25,21 @@
       "properties": {
         "URL": {
           "description": "Sets the WebSocket URL used to connect to WAS.",
-          "type": "string"
+          "$ref": "#/$defs/WasUrl"
         }
       },
       "required": [
         "URL"
       ]
+    },
+    "WasUrl": {
+      "description": "A validated Willow Application Server WebSocket URL.\n\nThis preserves the deployed TypeScript UI contract: the value must be an\nabsolute URL, start with lowercase `ws://` or `wss://`, and end in `/ws`.\nThe parsed path is checked separately so a fragment such as `#/ws` cannot\nmasquerade as the WebSocket endpoint path.",
+      "type": "string",
+      "pattern": "^wss?://[\\s\\S]*/ws$",
+      "x-willow-url-validation": {
+        "parser": "whatwg",
+        "pathnameSuffix": "/ws"
+      }
     },
     "Wifi": {
       "description": "Wi-Fi NVS namespace values.",

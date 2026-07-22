@@ -3,6 +3,7 @@
 use alloc::string::String;
 use core::fmt;
 use serde::{Deserialize, Serialize};
+use url::Url;
 
 /// The complete Willow NVS provisioning v1 JSON document.
 ///
@@ -24,6 +25,81 @@ pub struct Config {
     /// Configures the Wi-Fi connection.
     #[serde(rename = "WIFI")]
     pub wifi: Wifi,
+}
+
+/// Error returned when a Willow Application Server URL violates the v1
+/// provisioning contract.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum WasUrlError {
+    /// The value is not a parseable absolute URL.
+    InvalidUrl,
+    /// The value does not use the lowercase `ws` or `wss` scheme expected by
+    /// the existing TypeScript UI.
+    InvalidScheme,
+    /// The parsed URL path does not end in `/ws`.
+    InvalidPath,
+}
+
+impl fmt::Display for WasUrlError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::InvalidUrl => formatter.write_str("URL is invalid"),
+            Self::InvalidScheme => formatter.write_str("URL must start with ws:// or wss://"),
+            Self::InvalidPath => formatter.write_str("URL must end with /ws"),
+        }
+    }
+}
+
+/// A validated Willow Application Server WebSocket URL.
+///
+/// This preserves the deployed TypeScript UI contract: the value must be an
+/// absolute URL, start with lowercase `ws://` or `wss://`, and end in `/ws`.
+/// The parsed path is checked separately so a fragment such as `#/ws` cannot
+/// masquerade as the WebSocket endpoint path.
+#[cfg_attr(feature = "json-schema", derive(schemars::JsonSchema))]
+#[cfg_attr(
+    feature = "json-schema",
+    schemars(extend(
+        "pattern" = r"^wss?://[\s\S]*/ws$",
+        "x-willow-url-validation" = {
+            "parser": "whatwg",
+            "pathnameSuffix": "/ws"
+        }
+    ))
+)]
+// Debug is intentionally omitted because userinfo and query text may contain
+// credentials or tokens.
+#[derive(Clone, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(try_from = "String")]
+pub struct WasUrl(String);
+
+impl WasUrl {
+    /// Borrows the validated URL.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+
+    /// Returns the owned validated URL.
+    #[must_use]
+    pub fn into_inner(self) -> String {
+        self.0
+    }
+}
+
+impl TryFrom<String> for WasUrl {
+    type Error = WasUrlError;
+
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        let parsed = Url::parse(&value).map_err(|_| WasUrlError::InvalidUrl)?;
+        if !value.starts_with("ws://") && !value.starts_with("wss://") {
+            return Err(WasUrlError::InvalidScheme);
+        }
+        if !value.ends_with("/ws") || !parsed.path().ends_with("/ws") {
+            return Err(WasUrlError::InvalidPath);
+        }
+        Ok(Self(value))
+    }
 }
 
 /// Error returned when a Wi-Fi WPA passphrase violates the v1 contract.
@@ -157,7 +233,7 @@ impl TryFrom<String> for WifiSsid {
 pub struct Was {
     /// Sets the WebSocket URL used to connect to WAS.
     #[serde(rename = "URL")]
-    pub url: String,
+    pub url: WasUrl,
 }
 
 /// Wi-Fi NVS namespace values.

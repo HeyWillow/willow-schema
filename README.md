@@ -9,6 +9,17 @@ The runtime crate is unconditionally `no_std` and uses `alloc` for owned wire
 values. It supports `no_std` environments with an allocator; it is not intended
 for allocation-free environments.
 
+The NVS WAS URL preserves the deployed TypeScript UI validation contract: it
+must be an absolute lowercase `ws://` or `wss://` URL ending in `/ws`. Validation
+checks the parsed path as well as the source string so a fragment such as
+`wss://was.local/#/ws` is rejected.
+
+Standard JSON Schema cannot express the WHATWG URL acceptance set. The WAS URL
+schema therefore uses only a necessary source-string pattern and omits the RFC
+3986 `uri` format, which can reject values accepted by WHATWG parsing. The
+`x-willow-url-validation` extension identifies the required WHATWG parser and
+parsed pathname suffix for consumers that enforce the complete contract.
+
 ## Scope and non-goals
 
 This repository contains configuration data contracts only. It does not
